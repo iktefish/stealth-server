@@ -1,0 +1,26 @@
+{
+    "label": "location-identifying-string-lol",
+    "loc_rent": 750,
+    "employees": [
+        {
+            "email": "hokus_pokus@rukus.bolus",
+            "first_name": "Hokus",
+            "last_name": "Pokus",
+            "role": {
+                "title": "Manaless Mage",
+                "salary": 30
+            },
+            "date_hired": "2022-07-06T04:50:50.079+06:00",
+            "pt_ft": false,
+            "hourly_pay": 30,
+            "payment_due": 0,
+            "assigned_loc": 0
+        }
+    ],
+    "com_vehicles": [
+        {
+            "license_plate": "THE-MAGIC-CARPET",
+            "assigned_to": 0
+        }
+    ]
+}
