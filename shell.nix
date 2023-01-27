@@ -1,20 +1,13 @@
 with import <nixpkgs> {}; let
-  mongoGoDriver = buildGoModule {
-    src =
-      fetchFromGitHub
-      {}
-      + "github.com/mongodb/mongo-go-driver";
-  };
-  googleUuid = buildGoModule {
-    src =
-      fetchFromGitHub
-      {}
-      + "github.com/google/uuid";
-  };
+  run = pkgs.writeShellScriptBin ''run'' ''make run'';
+  test = pkgs.writeShellScriptBin ''run'' ''make test'';
+  build = pkgs.writeShellScriptBin ''run'' ''make build'';
 in
   stdenv.mkDerivation {
-    name = "go-mongoDb";
+    name = "stealth-server";
     buildInputs = with pkgs; [
-      graphviz
+      run
+      test
+      build
     ];
   }
