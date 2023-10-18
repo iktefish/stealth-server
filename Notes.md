@@ -29,6 +29,7 @@
     -   [ ] Membership/Subscription status
 
 -   [ ] Payment
+-   [ ] Implement `Auth` middleware
 
 # Data Modelling
 
@@ -81,3 +82,17 @@
     }
 }
 ```
+
+# Endpoints
+
+-   PUT `/check-in`
+-   PUT `/check-out`
+-   POST `/make-appointment`
+-   GET `/see-unconfirmed-appointments`
+-   GET `/see-confirmed-appointments`
+-   PUT `/assign-employee-to-appointment`
+-   PUT `/confirm-appointment`
+-   PUT `/assign-employee-to-date`
+-   PUT `/cant-make-date`
+-   PUT `/volunteer`
+-   POST `/apply-for-job`

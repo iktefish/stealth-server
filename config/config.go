@@ -10,10 +10,8 @@ import (
 	"google.golang.org/api/option"
 )
 
-/*
-Initiates a new Firebase SDK (using 'service-key.json' file) and from it construct
-Firebase Auth client and a Firestore Client.
-*/
+// Initiates a new Firebase SDK (using 'service-key.json' file) and from it construct
+// Firebase Auth client and a Firestore Client.
 func NewSdkAndClients() (*firebase.App, *auth.Client, *firestore.Client, error) {
 	var app, err_1 = InitFirebaseSdk()
 	if err_1 != nil {
@@ -34,11 +32,9 @@ func NewSdkAndClients() (*firebase.App, *auth.Client, *firestore.Client, error) 
 	return app, authClient, storeClient, nil
 }
 
-/*
-Initiates a new Firebase SDK from 'service-key.json' file. You can generate this file from
-"Firebase Console" > "Project Overview" > "Service accounts" > "Generate new private key"
-(select Go).
-*/
+// Initiates a new Firebase SDK from 'service-key.json' file. You can generate this file from
+// "Firebase Console" > "Project Overview" > "Service accounts" > "Generate new private key"
+// (select Go).
 func InitFirebaseSdk() (*firebase.App, error) {
 	var ctx = context.Background()
 	var opt = option.WithCredentialsFile(constants.ServiceKeyPath)
@@ -49,3 +45,13 @@ func InitFirebaseSdk() (*firebase.App, error) {
 
 	return app, nil
 }
+
+/* // Initiates the Firebase Admin SDK.
+func InitAdminSdk() (*firebase.App, error) {
+	var app, err = firebase.NewApp(context.Background(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return app, nil
+} */
