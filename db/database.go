@@ -46,7 +46,72 @@ func (r *Database) RegisterEmployee(employee schema.Employee) (error, int) {
 		return err, http.StatusInternalServerError
 	}
 
-	log.Printf("u~~> %s\n", userRecord)
+	log.Printf("userRecord~~> %s\n", userRecord)
+
+	var id = userRecord.UID
+	err, statusCode := r.CloneEmployeeDataToCloudStorage(id, employee)
+	if err != nil {
+		log.Printf("err~~> %s\n", err)
+		return err, statusCode
+	}
+
+	return nil, 0
+}
+
+func (r *Database) RemoveEmployee(uid string, employee schema.Employee) (error, int) {
+	var employeeToUpdate = (&auth.UserToUpdate{}).Disabled(true)
+	var userRecord, err = r.auth.UpdateUser(context.Background(), uid, employeeToUpdate)
+	if err != nil {
+		log.Printf("err~~> %s\n", err)
+		return err, http.StatusInternalServerError
+	}
+
+	log.Printf("userRecord~~> %s\n", userRecord)
+
+	err = r.auth.DeleteUser(context.Background(), uid)
+	if err != nil {
+		log.Printf("err~~> %s\n", err)
+		return err, http.StatusInternalServerError
+	}
+
+	log.Printf("DEL: uid", uid)
+
+	return nil, 0
+}
+
+func (r *Database) MarkEmployeeRemoved(uid string, employee schema.Employee) (error, int) {
+	var docRef, err = r.client.Collection(constants.CONFIRMED_APPOINTMENTS).Doc(uid).Update(context.Background(), []firestore.Update{
+		{
+			Path: "isEmployeeActive",
+			Value: struct {
+				isActive    bool
+				dateRemoved time.Time
+			}{
+				isActive:    false,
+				dateRemoved: time.Now(),
+			},
+		},
+	})
+	if err != nil {
+		log.Printf("err~~> %s\n", err)
+		return err, http.StatusInternalServerError
+	}
+
+	log.Printf("UPD: docRef~~> %s\n", docRef)
+
+	return nil, 0
+}
+
+func (r *Database) CloneEmployeeDataToCloudStorage(id string, employee schema.Employee) (error, int) {
+	var ctx = context.Background()
+	var docRef, err = r.client.Collection("Employee").Doc(id).Set(ctx, employee)
+	if err != nil {
+		log.Printf("err~~> %s\n", err)
+		return err, http.StatusInternalServerError
+	}
+
+	log.Printf("INS: docRef~~> %s\n", docRef)
+
 	return nil, 0
 }
 

@@ -25,7 +25,6 @@ func main() {
 
 	var db = db.NewDatabase(app, storeClient, authClient)
 	var handler = handler.NewHandler(db)
-
 	/* -- */
 
 	fmt.Printf("app~~> %s\n", app)

@@ -17,6 +17,18 @@ type Employee struct {
 	Address            string    `json:"address" firestore:"address"`
 	Birthday           time.Time `json:"birthday" firestore:"birthday"`
 	Nationality        string    `json:"nationality" firestore:"nationality"`
+	Position           string    `json:"position" firestore:"position"`
+	Gender             string    `json:"gender" firestore:"gender"`
+	Eligible           string    `json:"eligible" firestore:"eligible"`
+	Car                string    `json:"car" firestore:"car"`
+	Offense            string    `json:"offense" firestore:"offense"`
+	ShiftsMayAug       string    `json:"shiftsMayAug" firestore:"shiftsMayAug"`
+	ShiftsApr          string    `json:"shiftsApr" firestore:"shiftsApr"`
+	ShiftsSepOct       string    `json:"shiftsSepOct" firestore:"shiftsSepOct"`
+	HourlyWage         string    `json:"hourlyWage" firestore:"hourlyWage"`
+	NidBlobLink        string    `json:"nidBlobLink" firestore:"nidBlobLink"`
+	CvBlobLink         string    `json:"cvBlobUrl" firestore:"cvBlobUrl"`
+	DateCreated        time.Time `json:"dateCreated" firestore:"dateCreated"`
 	ApplicationFormUrl string    `json:"applicationFormUrl" firestore:"applicationFormUrl"`
 }
 

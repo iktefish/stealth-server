@@ -5,19 +5,16 @@ import (
 	"time"
 )
 
-/*
-Absolute path of the 'service-key.json' file used to initiate Firebase SDK.
-*/
+/* Absolute path of the 'service-key.json' file used to initiate Firebase SDK. */
 var ServiceKeyPath = os.Getenv("PROJECT_ROOT") + "/service-key.json"
 
-/*
-Database collection names:
-*/
+/* Database collection names */
 const (
-	Locations               = "Locations"
-	UnconfirmedAppointments = "UnconfirmedAppointments"
-	ConfirmedAppointments   = "ConfirmedAppointments"
-	WorkDays                = "WorkDays"
+	EMPLOYEES                = "employees"
+	LOCATIONS                = "locations"
+	UNCONFIRMED_APPOINTMENTS = "unconfirmed-appointments"
+	CONFIRMED_APPOINTMENTS   = "confirmed-appointments"
+	WORKDAYS                 = "work-days"
 )
 
 type WorkHours struct {
