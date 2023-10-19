@@ -42,16 +42,16 @@ func (r *Database) RegisterEmployee(employee schema.Employee) (error, int) {
 	/* var userRecord, err = r.auth.GetUserByEmail(context.Background(), employee.Email) */
 	var userRecord, err = r.auth.CreateUser(context.Background(), employeeToCreate)
 	if err != nil {
-		log.Printf("err~~> %s\n", err)
+		log.Printf("err~~> %v\n", err)
 		return err, http.StatusInternalServerError
 	}
 
-	log.Printf("userRecord~~> %s\n", userRecord)
+	log.Printf("userRecord~~> %v\n", userRecord)
 
 	var id = userRecord.UID
 	err, statusCode := r.CloneEmployeeDataToCloudStorage(id, employee)
 	if err != nil {
-		log.Printf("err~~> %s\n", err)
+		log.Printf("err~~> %v\n", err)
 		return err, statusCode
 	}
 
@@ -62,11 +62,11 @@ func (r *Database) RemoveEmployee(uid string, employee schema.Employee) (error, 
 	var employeeToUpdate = (&auth.UserToUpdate{}).Disabled(true)
 	var userRecord, err = r.auth.UpdateUser(context.Background(), uid, employeeToUpdate)
 	if err != nil {
-		log.Printf("err~~> %s\n", err)
+		log.Printf("err~~> %v\n", err)
 		return err, http.StatusInternalServerError
 	}
 
-	log.Printf("userRecord~~> %s\n", userRecord)
+	log.Printf("userRecord~~> %v\n", userRecord)
 
 	err = r.auth.DeleteUser(context.Background(), uid)
 	if err != nil {
@@ -117,7 +117,7 @@ func (r *Database) CloneEmployeeDataToCloudStorage(id string, employee schema.Em
 
 func (r *Database) PutCheckIn(locId string) (error, int) {
 	var ctx = context.Background()
-	var results, err = r.client.Collection(constants.Locations).Doc(locId).Update(ctx, []firestore.Update{
+	var results, err = r.client.Collection(constants.LOCATIONS).Doc(locId).Update(ctx, []firestore.Update{
 		{
 			Path:  "open",
 			Value: true,
@@ -133,7 +133,7 @@ func (r *Database) PutCheckIn(locId string) (error, int) {
 
 func (r *Database) PutCheckOut(locId string) (error, int) {
 	var ctx = context.Background()
-	var results, err = r.client.Collection(constants.Locations).Doc(locId).Update(ctx, []firestore.Update{
+	var results, err = r.client.Collection(constants.LOCATIONS).Doc(locId).Update(ctx, []firestore.Update{
 		{
 			Path:  "open",
 			Value: false,
@@ -149,7 +149,7 @@ func (r *Database) PutCheckOut(locId string) (error, int) {
 
 func (r *Database) PostAppointment(uap schema.UnconfirmedAppointment, cell int) (error, int) {
 	var ctx = context.Background()
-	var docRef, results, err = r.client.Collection(constants.UnconfirmedAppointments).Add(ctx, uap)
+	var docRef, results, err = r.client.Collection(constants.UNCONFIRMED_APPOINTMENTS).Add(ctx, uap)
 	if err != nil {
 		return err, http.StatusInternalServerError
 	}
@@ -160,7 +160,7 @@ func (r *Database) PostAppointment(uap schema.UnconfirmedAppointment, cell int) 
 
 func (r *Database) GetUnconfirmedAppointments(uaps *[]schema.UnconfirmedAppointment) (error, int) {
 	var ctx = context.Background()
-	var iter = r.client.Collection(constants.UnconfirmedAppointments).OrderBy("postDate", firestore.Asc).Limit(25).Documents(ctx)
+	var iter = r.client.Collection(constants.UNCONFIRMED_APPOINTMENTS).OrderBy("postDate", firestore.Asc).Limit(25).Documents(ctx)
 	var counter int
 	for {
 		var doc, err = iter.Next()
@@ -188,7 +188,7 @@ func (r *Database) GetUnconfirmedAppointments(uaps *[]schema.UnconfirmedAppointm
 
 func (r *Database) GetConfirmedAppointments(aps *[]schema.ConfirmedAppointment) (error, int) {
 	var ctx = context.Background()
-	var iter = r.client.Collection(constants.ConfirmedAppointments).OrderBy("date", firestore.Asc).Limit(25).Documents(ctx)
+	var iter = r.client.Collection(constants.CONFIRMED_APPOINTMENTS).OrderBy("date", firestore.Asc).Limit(25).Documents(ctx)
 	var counter int
 	for {
 		var doc, err = iter.Next()
@@ -216,7 +216,7 @@ func (r *Database) GetConfirmedAppointments(aps *[]schema.ConfirmedAppointment) 
 
 func (r *Database) PutEmployeeToAppointment(eId string, apId string) (error, int) {
 	var ctx = context.Background()
-	var result, err = r.client.Collection(constants.ConfirmedAppointments).Doc(apId).Update(ctx, []firestore.Update{
+	var result, err = r.client.Collection(constants.CONFIRMED_APPOINTMENTS).Doc(apId).Update(ctx, []firestore.Update{
 		{
 			Path:  "assignedTo",
 			Value: eId,
@@ -236,7 +236,7 @@ func (r *Database) PutEmployeeToAppointment(eId string, apId string) (error, int
 
 func (r *Database) PutConfirmAppointment(uapId string) (error, int) {
 	var ctx = context.Background()
-	var docSnap, err_1 = r.client.Collection(constants.UnconfirmedAppointments).Doc(uapId).Get(ctx)
+	var docSnap, err_1 = r.client.Collection(constants.UNCONFIRMED_APPOINTMENTS).Doc(uapId).Get(ctx)
 	if err_1 != nil {
 		return err_1, http.StatusInternalServerError
 	}
@@ -256,7 +256,7 @@ func (r *Database) PutConfirmAppointment(uapId string) (error, int) {
 		Completed:       false,
 	}
 
-	var docRef, results, err_2 = r.client.Collection(constants.ConfirmedAppointments).Add(ctx, ap)
+	var docRef, results, err_2 = r.client.Collection(constants.CONFIRMED_APPOINTMENTS).Add(ctx, ap)
 	if err_2 != nil {
 		return err_2, http.StatusInternalServerError
 	}
@@ -281,7 +281,7 @@ func (r *Database) PutAssignEmployeeToDate(date int64) (error, int) {
 		Date:                today,
 		LocationAssignments: []schema.LocationAssignment{},
 	}
-	var iter = r.client.Collection(constants.WorkDays).Where("date", "==", today).Documents(ctx)
+	var iter = r.client.Collection(constants.WORKDAYS).Where("date", "==", today).Documents(ctx)
 	var counter int
 	for {
 		var _, err = iter.Next()
@@ -297,7 +297,7 @@ func (r *Database) PutAssignEmployeeToDate(date int64) (error, int) {
 	}
 
 	if counter == 0 {
-		var docRef, results, err = r.client.Collection(constants.WorkDays).Add(ctx, workDay)
+		var docRef, results, err = r.client.Collection(constants.WORKDAYS).Add(ctx, workDay)
 		if err != nil {
 			return err, http.StatusInternalServerError
 		}
