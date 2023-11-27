@@ -29,52 +29,100 @@ func NewDatabase(app *firebase.App, client *firestore.Client, auth *auth.Client)
 	}
 }
 
+/** @_ Debugging utilities **/
+
+func (r *Database) DEBUG_GetEmployeeData(uid string, e *schema.Employee) (error, int) {
+	var ctx = context.Background()
+	var employeeCollection = r.client.Collection(constants.EMPLOYEES)
+	var docRef, err = employeeCollection.Doc(uid).Get(ctx)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	err = docRef.DataTo(e)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	log.Printf("Log: docRef.Exists()~~> %v\n", docRef.Exists())
+	return nil, http.StatusOK
+}
+
+/** // **/
+
 /** @_ Auth server **/
 
-func (r *Database) RegisterEmployee(employee schema.Employee) (error, int) {
+func (r *Database) RegisterEmployee(employee schema.EmployeeRegisterForm) (error, int, string) {
 	var employeeToCreate = (&auth.UserToCreate{}).
 		Email(employee.Email).
 		EmailVerified(false).
-		PhoneNumber(employee.PhoneNumber).
+		PhoneNumber(employee.Phone).
 		Password(employee.Password).
-		DisplayName(employee.DisplayName).
-		PhotoURL(employee.PhotoUrl).
+		DisplayName(employee.FirstName + " " + employee.LastName).
+		PhotoURL(employee.ProfilePhotoUrl.Url).
 		Disabled(false)
 
 	/* var userRecord, err = r.auth.GetUserByEmail(context.Background(), employee.Email) */
 	var userRecord, err = r.auth.CreateUser(context.Background(), employeeToCreate)
 	if err != nil {
 		log.Printf("err~~> %v\n", err)
-		return err, http.StatusInternalServerError
+		return err, http.StatusInternalServerError, ""
 	}
 
-	log.Printf("userRecord~~> %v\n", userRecord)
+	log.Printf("userRecord~~> %v\n", userRecord.UID)
 
-	var id = userRecord.UID
-	err, statusCode := r.CloneEmployeeDataToFirestore(id, employee)
-	if err != nil {
-		log.Printf("err~~> %v\n", err)
-		return err, statusCode
-	}
+	// var id = userRecord.UID
+	// err, statusCode := r.CloneEmployeeDataToFirestore(id, employee)
+	// if err != nil {
+	// 	log.Printf("err~~> %v\n", err)
+	// 	return err, statusCode
+	// }
 
-	return nil, 0
+	return nil, 0, userRecord.UID
 }
 
-func (r *Database) CloneEmployeeDataToFirestore(id string, employee schema.Employee) (error, int) {
-	var ctx = context.Background()
-	var employeeCollection = r.client.Collection(constants.EMPLOYEES)
-	var docRef, err = employeeCollection.Doc(id).Set(ctx, employee)
-	if err != nil {
-		log.Printf("err~~> %s\n", err)
-		return err, http.StatusInternalServerError
-	}
+/*
+Cloning employee account data into firestore will be done via the client SDK, therefore
+the following code is redundant.
+*/
+// func (r *Database) CloneEmployeeDataToFirestore(id string, employeeRegisterForm schema.EmployeeRegisterForm) (error, int) {
+// 	var ctx = context.Background()
+// 	var employeeCollection = r.client.Collection(constants.EMPLOYEES)
+// 	var employee = schema.Employee{
+// 		FirstName:       employeeRegisterForm.FirstName,
+// 		LastName:        employeeRegisterForm.LastName,
+// 		Phone:           employeeRegisterForm.Phone,
+// 		Position:        employeeRegisterForm.Position,
+// 		Gender:          employeeRegisterForm.Gender,
+// 		Email:           employeeRegisterForm.Email,
+// 		Birthday:        employeeRegisterForm.Birthday,
+// 		Address:         employeeRegisterForm.Address,
+// 		Eligibility:     employeeRegisterForm.Eligibility,
+// 		Car:             employeeRegisterForm.Car,
+// 		CriminalOffense: employeeRegisterForm.CriminalOffense,
+// 		ShiftsMayAug:    employeeRegisterForm.ShiftsMayAug,
+// 		ShiftsApr:       employeeRegisterForm.ShiftsApr,
+// 		ShiftsSepOct:    employeeRegisterForm.ShiftsSepOct,
+// 		HourlyWage:      employeeRegisterForm.HourlyWage,
+// 		Nationality:     employeeRegisterForm.Nationality,
+// 		NidBlobLink:     employeeRegisterForm.NidBlobLink,
+// 		CvBlobLink:      employeeRegisterForm.CvBlobLink,
+// 		ProfilePhotoUrl: employeeRegisterForm.ProfilePhotoUrl,
+// 		Date:            time.Time{},
+// 	}
+//
+// 	var docRef, err = employeeCollection.Doc(id).Set(ctx, employee)
+// 	if err != nil {
+// 		log.Printf("err~~> %s\n", err)
+// 		return err, http.StatusInternalServerError
+// 	}
+//
+// 	log.Printf("INS: docRef~~> %s\n", docRef)
+//
+// 	return nil, 0
+// }
 
-	log.Printf("INS: docRef~~> %s\n", docRef)
-
-	return nil, 0
-}
-
-func (r *Database) RemoveEmployee(uid string, employee schema.Employee) (error, int) {
+func (r *Database) RemoveEmployee(uid string) (error, int) {
 	var employeeToUpdate = (&auth.UserToUpdate{}).Disabled(true)
 	var userRecord, err = r.auth.UpdateUser(context.Background(), uid, employeeToUpdate)
 	if err != nil {

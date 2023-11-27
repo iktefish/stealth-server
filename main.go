@@ -55,6 +55,10 @@ func main() {
 	router.Post("/for-job", handler.PostForJob)
 	/* -- */
 
+	/* -- Debugging utilities -- */
+	router.Post("/get-employee", handler.DEBUG_GetEmployeeData)
+	/* -- */
+
 	/* -- Server loop -- */
 	log.Println("Server listening on port: ", port)
 	log.Fatalln(http.ListenAndServe(port, router))

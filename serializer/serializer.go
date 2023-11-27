@@ -29,6 +29,15 @@ func (s *Serializer) JsonToEmployee(r *http.Request, e *schema.Employee) (error,
 	return nil, http.StatusOK
 }
 
+func (s *Serializer) JsonToEmployeeRegisterForm(r *http.Request, e *schema.EmployeeRegisterForm) (error, int) {
+	var err = json.NewDecoder(r.Body).Decode(e)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}
+
 func (s *Serializer) JsonToWorkDay(r *http.Request, w *schema.WorkDay) (error, int) {
 	var err = json.NewDecoder(r.Body).Decode(w)
 	if err != nil {

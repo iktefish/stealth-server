@@ -1,12 +1,12 @@
 {
-  "name": "Employee Name",
-  "email": "harry-potter@jk.rw",
-  "password": "123456",
-  "photoUrl": "unsplash.com",
-  "phoneNumber": "+8801919191919",
-  "displayName": "This employee has a name that is display(able)",
-  "address": "H-13#🔥#💗#👀#😱",
-  "birthday": "2023-10-18T13:49:17.708Z",
-  "nationality": "From the Homeland",
-  "applicationFormUrl": "docs.google.com"
+    "name": "Employee Name",
+    "email": "jamie@lani.star",
+    "password": "123456",
+    "photoUrl": "unsplash.com",
+    "phoneNumber": "+8801919191913",
+    "displayName": "This employee has a name that is display(able)",
+    "address": "H-13#🔥#💗#👀#😱",
+    "birthday": "2023-10-18T13:49:17.708Z",
+    "nationality": "From the Homeland",
+    "applicationFormUrl": "docs.google.com"
 }
