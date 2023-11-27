@@ -10,7 +10,8 @@ var ServiceKeyPath = os.Getenv("PROJECT_ROOT") + "/service-key.json"
 
 /* Database collection names */
 const (
-	EMPLOYEES                = "employees"
+	EMPLOYEES                = "Employee"
+	EX_EMPLOYEES             = "ex-employees"
 	LOCATIONS                = "locations"
 	UNCONFIRMED_APPOINTMENTS = "unconfirmed-appointments"
 	CONFIRMED_APPOINTMENTS   = "confirmed-appointments"

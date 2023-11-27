@@ -29,6 +29,8 @@ func NewDatabase(app *firebase.App, client *firestore.Client, auth *auth.Client)
 	}
 }
 
+/** @_ Auth server **/
+
 func (r *Database) RegisterEmployee(employee schema.Employee) (error, int) {
 	var employeeToCreate = (&auth.UserToCreate{}).
 		Email(employee.Email).
@@ -49,11 +51,25 @@ func (r *Database) RegisterEmployee(employee schema.Employee) (error, int) {
 	log.Printf("userRecord~~> %v\n", userRecord)
 
 	var id = userRecord.UID
-	err, statusCode := r.CloneEmployeeDataToCloudStorage(id, employee)
+	err, statusCode := r.CloneEmployeeDataToFirestore(id, employee)
 	if err != nil {
 		log.Printf("err~~> %v\n", err)
 		return err, statusCode
 	}
+
+	return nil, 0
+}
+
+func (r *Database) CloneEmployeeDataToFirestore(id string, employee schema.Employee) (error, int) {
+	var ctx = context.Background()
+	var employeeCollection = r.client.Collection(constants.EMPLOYEES)
+	var docRef, err = employeeCollection.Doc(id).Set(ctx, employee)
+	if err != nil {
+		log.Printf("err~~> %s\n", err)
+		return err, http.StatusInternalServerError
+	}
+
+	log.Printf("INS: docRef~~> %s\n", docRef)
 
 	return nil, 0
 }
@@ -74,13 +90,17 @@ func (r *Database) RemoveEmployee(uid string, employee schema.Employee) (error, 
 		return err, http.StatusInternalServerError
 	}
 
-	log.Printf("DEL: uid", uid)
+	r.MarkEmployeeRemoved(uid)
+
+	log.Printf("DEL: uid %v", uid)
+	log.Printf("MARKED: uid %v as INACTIVE", uid)
 
 	return nil, 0
 }
 
-func (r *Database) MarkEmployeeRemoved(uid string, employee schema.Employee) (error, int) {
-	var docRef, err = r.client.Collection(constants.CONFIRMED_APPOINTMENTS).Doc(uid).Update(context.Background(), []firestore.Update{
+func (r *Database) MarkEmployeeRemoved(uid string) (error, int) {
+	var confirmedAppointmentsCollection = r.client.Collection(constants.CONFIRMED_APPOINTMENTS)
+	var docRef, err = confirmedAppointmentsCollection.Doc(uid).Update(context.Background(), []firestore.Update{
 		{
 			Path: "isEmployeeActive",
 			Value: struct {
@@ -102,18 +122,7 @@ func (r *Database) MarkEmployeeRemoved(uid string, employee schema.Employee) (er
 	return nil, 0
 }
 
-func (r *Database) CloneEmployeeDataToCloudStorage(id string, employee schema.Employee) (error, int) {
-	var ctx = context.Background()
-	var docRef, err = r.client.Collection("Employee").Doc(id).Set(ctx, employee)
-	if err != nil {
-		log.Printf("err~~> %s\n", err)
-		return err, http.StatusInternalServerError
-	}
-
-	log.Printf("INS: docRef~~> %s\n", docRef)
-
-	return nil, 0
-}
+/** // **/
 
 func (r *Database) PutCheckIn(locId string) (error, int) {
 	var ctx = context.Background()

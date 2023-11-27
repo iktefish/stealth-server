@@ -21,6 +21,8 @@ func NewHandler(db db.Database) Handler {
 	}
 }
 
+/** @_ Auth server **/
+
 func (h *Handler) RegisterEmployee(w http.ResponseWriter, r *http.Request) {
 	var employee schema.Employee
 	var err, statusCode = seri.JsonToEmployee(r, &employee)
@@ -37,9 +39,27 @@ func (h *Handler) RegisterEmployee(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) RemoveEmployee(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Unimplemented")
-	return
+	var uid = r.URL.Query().Get("id")
+	if uid == "" {
+		http.Error(w, fmt.Errorf("UID is empty").Error(), http.StatusBadRequest)
+		return
+	}
+
+	var employee schema.Employee
+	var err, statusCode = seri.JsonToEmployee(r, &employee)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Failed marshal").Error(), statusCode)
+		return
+	}
+
+	err, statusCode = h.db.RemoveEmployee(uid, employee)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Failed to remove Employee").Error(), statusCode)
+		return
+	}
 }
+
+/** // **/
 
 func (h *Handler) PutCheckIn(w http.ResponseWriter, r *http.Request) {
 	var locId = r.URL.Query().Get("id")
