@@ -138,7 +138,7 @@ func (r *Database) RemoveEmployee(uid string) (error, int) {
 		return err, http.StatusInternalServerError
 	}
 
-	r.MarkEmployeeRemoved(uid)
+	// r.MarkEmployeeRemoved(uid)
 
 	log.Printf("DEL: uid %v", uid)
 	log.Printf("MARKED: uid %v as INACTIVE", uid)
@@ -146,29 +146,34 @@ func (r *Database) RemoveEmployee(uid string) (error, int) {
 	return nil, 0
 }
 
-func (r *Database) MarkEmployeeRemoved(uid string) (error, int) {
-	var confirmedAppointmentsCollection = r.client.Collection(constants.CONFIRMED_APPOINTMENTS)
-	var docRef, err = confirmedAppointmentsCollection.Doc(uid).Update(context.Background(), []firestore.Update{
-		{
-			Path: "isEmployeeActive",
-			Value: struct {
-				isActive    bool
-				dateRemoved time.Time
-			}{
-				isActive:    false,
-				dateRemoved: time.Now(),
-			},
-		},
-	})
-	if err != nil {
-		log.Printf("err~~> %s\n", err)
-		return err, http.StatusInternalServerError
-	}
-
-	log.Printf("UPD: docRef~~> %s\n", docRef)
-
-	return nil, 0
-}
+/*
+We will not be having an `isEmployeeActive` field, rather we will have a seperate collection
+that will hold all 'ex-employees'. CRUD operations on said collection will be done via the
+client SDK, thus the following function is redundant.
+*/
+// func (r *Database) MarkEmployeeRemoved(uid string) (error, int) {
+// 	var confirmedAppointmentsCollection = r.client.Collection(constants.CONFIRMED_APPOINTMENTS)
+// 	var docRef, err = confirmedAppointmentsCollection.Doc(uid).Update(context.Background(), []firestore.Update{
+// 		{
+// 			Path: "isEmployeeActive",
+// 			Value: struct {
+// 				isActive    bool
+// 				dateRemoved time.Time
+// 			}{
+// 				isActive:    false,
+// 				dateRemoved: time.Now(),
+// 			},
+// 		},
+// 	})
+// 	if err != nil {
+// 		log.Printf("err~~> %s\n", err)
+// 		return err, http.StatusInternalServerError
+// 	}
+//
+// 	log.Printf("UPD: docRef~~> %s\n", docRef)
+//
+// 	return nil, 0
+// }
 
 /** // **/
 
