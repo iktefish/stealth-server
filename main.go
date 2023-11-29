@@ -29,8 +29,8 @@ func main() {
 
 	/** // **/
 
-	fmt.Printf("app~~> %s\n", app)
-	fmt.Printf("storeClient~~> %s\n", storeClient)
+	log.Printf("app~~> %s\n", app)
+	log.Printf("storeClient~~> %s\n", storeClient)
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, "Welcome to Stealth ...")
