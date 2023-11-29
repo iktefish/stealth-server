@@ -92,26 +92,30 @@ func (h *Handler) RemoveEmployee(w http.ResponseWriter, r *http.Request) {
 
 /** // **/
 
-func (h *Handler) PutCheckIn(w http.ResponseWriter, r *http.Request) {
+/** @_ Clock in/out functionality **/
+
+func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	var locId = r.URL.Query().Get("id")
 	if locId == "" {
 		http.Error(w, "Empty Location ID", http.StatusBadRequest)
 	}
 
-	h.db.PutCheckIn(locId)
+	h.db.ClockIn(locId)
 	/* logic.CheckWorkDayOver(h.db, locId) */
 	return
 }
 
-func (h *Handler) PutCheckOut(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ClickOut(w http.ResponseWriter, r *http.Request) {
 	var locId = r.URL.Query().Get("id")
 	if locId == "" {
 		http.Error(w, "Empty Location ID", http.StatusBadRequest)
 	}
 
-	h.db.PutCheckOut(locId)
+	h.db.ClockOut(locId)
 	return
 }
+
+/** // **/
 
 func (h *Handler) PostAppointment(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Unimplemented")

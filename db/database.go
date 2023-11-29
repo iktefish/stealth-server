@@ -177,7 +177,9 @@ client SDK, thus the following function is redundant.
 
 /** // **/
 
-func (r *Database) PutCheckIn(locId string) (error, int) {
+/** @_ Clock in/out functionality **/
+
+func (r *Database) ClockIn(locId string) (error, int) {
 	var ctx = context.Background()
 	var results, err = r.client.Collection(constants.LOCATIONS).Doc(locId).Update(ctx, []firestore.Update{
 		{
@@ -193,7 +195,7 @@ func (r *Database) PutCheckIn(locId string) (error, int) {
 	return nil, http.StatusOK
 }
 
-func (r *Database) PutCheckOut(locId string) (error, int) {
+func (r *Database) ClockOut(locId string) (error, int) {
 	var ctx = context.Background()
 	var results, err = r.client.Collection(constants.LOCATIONS).Doc(locId).Update(ctx, []firestore.Update{
 		{
@@ -208,6 +210,8 @@ func (r *Database) PutCheckOut(locId string) (error, int) {
 	log.Printf("Log: results~~> %v\n", results)
 	return nil, http.StatusOK
 }
+
+/** // **/
 
 func (r *Database) PostAppointment(uap schema.UnconfirmedAppointment, cell int) (error, int) {
 	var ctx = context.Background()

@@ -16,7 +16,8 @@ func main() {
 	var router = chi.NewRouter()
 	const port string = ":8080"
 
-	/* -- Firebase SDK and clients setup -- */
+	/** @_ Firebase SDK and clients setup **/
+
 	var app, authClient, storeClient, err = config.NewSdkAndClients()
 	if err != nil {
 		log.Println("Fatal crash during setup")
@@ -25,7 +26,8 @@ func main() {
 
 	var db = db.NewDatabase(app, storeClient, authClient)
 	var handler = handler.NewHandler(db)
-	/* -- */
+
+	/** // **/
 
 	fmt.Printf("app~~> %s\n", app)
 	fmt.Printf("storeClient~~> %s\n", storeClient)
@@ -34,9 +36,10 @@ func main() {
 		fmt.Fprintln(w, "Welcome to Stealth ...")
 	})
 
-	/* -- Apply Auth middleware -- */
-	router.Put("/check-in", middleware.AuthMiddleware(handler.PutCheckIn))
-	router.Put("/check-out", middleware.AuthMiddleware(handler.PutCheckOut))
+	/** @_ Apply Auth middleware **/
+
+	router.Put("/check-in", middleware.AuthMiddleware(handler.ClockIn))
+	router.Put("/check-out", middleware.AuthMiddleware(handler.ClickOut))
 	router.Post("/appointment", middleware.AuthMiddleware(handler.PostAppointment))
 	router.Get("/confirmed-appointments", middleware.AuthMiddleware(handler.GetConfirmedAppointments))
 	router.Put("/employee-to-appointment", middleware.AuthMiddleware(handler.PutEmployeeToAppointment))
@@ -44,23 +47,30 @@ func main() {
 	router.Put("/assign-employee-to-date", middleware.AuthMiddleware(handler.PutAssignEmployeeToDate))
 	router.Put("/cant-make-date", middleware.AuthMiddleware(handler.PutCantMakeDate))
 	router.Put("/volunteer", middleware.AuthMiddleware(handler.PutVolunteer))
-	/* -- */
 
-	/* -- No Auth middleware applied -- */
+	/** // **/
+
+	/** @_ No Auth middleware applied **/
+
 	router.Post("/register-employee", handler.RegisterEmployee)
 	router.Post("/remove-employee", handler.RemoveEmployee)
 	router.Get("/location-info", handler.GetLocationStatus)
 	router.Post("/appointment", middleware.AuthMiddleware(handler.PostAppointment))
 	router.Get("/unconfirmed-appointments", handler.GetUnconfirmedAppointments)
 	router.Post("/for-job", handler.PostForJob)
-	/* -- */
 
-	/* -- Debugging utilities -- */
+	/** // **/
+
+	/** @_ Debugging utilities **/
+
 	router.Post("/get-employee", handler.DEBUG_GetEmployeeData)
-	/* -- */
 
-	/* -- Server loop -- */
+	/** // **/
+
+	/** @_ Server loop **/
+
 	log.Println("Server listening on port: ", port)
 	log.Fatalln(http.ListenAndServe(port, router))
-	/* -- */
+
+	/** // **/
 }
