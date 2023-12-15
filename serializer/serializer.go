@@ -65,6 +65,24 @@ func (s *Serializer) JsonToConfirmedAppointment(r *http.Request, a *schema.Confi
 	return nil, http.StatusOK
 }
 
+func (s *Serializer) JsonToEmployeeAttendanceData(r *http.Request, a *schema.EmployeeAttendanceData) (error, int) {
+	var err = json.NewDecoder(r.Body).Decode(a)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}
+
+func (s *Serializer) JsonToTent(r *http.Request, t *schema.Tent) (error, int) {
+	var err = json.NewDecoder(r.Body).Decode(t)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}
+
 func (s *Serializer) LocationToJson(w io.Writer, l schema.Location) (error, int) {
 	var err = json.NewEncoder(w).Encode(l)
 	if err != nil {
@@ -76,6 +94,33 @@ func (s *Serializer) LocationToJson(w io.Writer, l schema.Location) (error, int)
 
 func (s *Serializer) EmployeeToJson(w io.Writer, e schema.Employee) (error, int) {
 	var err = json.NewEncoder(w).Encode(e)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}
+
+func (s *Serializer) EmployeeAttendanceDataToJson(w io.Writer, a schema.EmployeeAttendanceData) (error, int) {
+	var err = json.NewEncoder(w).Encode(a)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}
+
+func (s *Serializer) ListOfEmployeeAttendanceDataToJson(w io.Writer, a []schema.EmployeeAttendanceData) (error, int) {
+	var err = json.NewEncoder(w).Encode(a)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}
+
+func (s *Serializer) TentToJson(w io.Writer, t schema.Tent) (error, int) {
+	var err = json.NewEncoder(w).Encode(t)
 	if err != nil {
 		return err, http.StatusInternalServerError
 	}

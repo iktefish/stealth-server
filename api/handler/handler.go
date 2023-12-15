@@ -33,11 +33,50 @@ func (h *Handler) DEBUG_GetEmployeeData(w http.ResponseWriter, r *http.Request) 
 	}
 
 	var employee schema.Employee
-	var err, statusCode = seri.EmployeeToJson(w, employee)
+	err, statusCode := h.db.DEBUG_GetEmployeeData(id, &employee)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Internal server error").Error(), statusCode)
+		return
+	}
+
+	err, statusCode = seri.EmployeeToJson(w, employee)
 	if err != nil {
 		http.Error(w, fmt.Errorf("Failed unmarshal").Error(), statusCode)
 		return
 	}
+}
+
+// func (h *Handler) DEBUG_GetAllAttendanceData(w http.ResponseWriter, r *http.Request) {
+// 	var attendenceDate schema.EmployeeAttendanceData
+// 	err, statusCode := h.db.DEBUG_GetClockedInEmployees(&attendenceDate)
+// 	if err != nil {
+// 		http.Error(w, fmt.Errorf("Internal server error").Error(), statusCode)
+// 		return
+// 	}
+//
+// 	err, statusCode = seri.EmployeeAttendanceDataToJson(w, attendenceDate)
+// 	if err != nil {
+// 		http.Error(w, fmt.Errorf("Failed unmarshal").Error(), statusCode)
+// 		return
+// 	}
+// }
+
+func (h *Handler) DEBUG_GetClockedInEmployees(w http.ResponseWriter, r *http.Request) {
+	var attendanceData []schema.EmployeeAttendanceData
+	err, statusCode := h.db.DEBUG_GetClockedInEmployeesAttendanceData(&attendanceData)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Internal server error").Error(), statusCode)
+		return
+	}
+
+	err, statusCode = seri.ListOfEmployeeAttendanceDataToJson(w, attendanceData)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Failed unmarshal").Error(), statusCode)
+		return
+	}
+}
+
+func (h *Handler) DEBUG_GetClockedOutEmployees(w http.ResponseWriter, r *http.Request) {
 }
 
 /** // **/
@@ -92,26 +131,39 @@ func (h *Handler) RemoveEmployee(w http.ResponseWriter, r *http.Request) {
 
 /** // **/
 
-/** @_ Clock in/out functionality **/
+/** @_ Clock in/out **/
 
 func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
-	var locId = r.URL.Query().Get("id")
-	if locId == "" {
-		http.Error(w, "Empty Location ID", http.StatusBadRequest)
+	var employeeId = r.URL.Query().Get("employeeId")
+	var tentId = r.URL.Query().Get("tentId")
+	if tentId == "" {
+		http.Error(w, "Empty tent ID", http.StatusBadRequest)
+		return
+	}
+	if employeeId == "" {
+		http.Error(w, "Empty employee ID", http.StatusBadRequest)
+		return
 	}
 
-	h.db.ClockIn(locId)
+	var tent schema.Tent
+	var err, statusCode = seri.JsonToTent(r, &tent)
+	if err != nil {
+		http.Error(w, "Faulty JSON provided", statusCode)
+		return
+	}
+
+	h.db.ClockIn(tentId, employeeId, tent)
 	/* logic.CheckWorkDayOver(h.db, locId) */
 	return
 }
 
-func (h *Handler) ClickOut(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) ClockOut(w http.ResponseWriter, r *http.Request) {
 	var locId = r.URL.Query().Get("id")
 	if locId == "" {
-		http.Error(w, "Empty Location ID", http.StatusBadRequest)
+		http.Error(w, "Empty tent ID", http.StatusBadRequest)
 	}
 
-	h.db.ClockOut(locId)
+	// h.db.ClockOut(locId)
 	return
 }
 

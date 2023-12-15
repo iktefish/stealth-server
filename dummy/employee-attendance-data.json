@@ -1,0 +1,23 @@
+{
+    "date": "",
+    "clockIn": "",
+    "clockOut": "",
+    "clockedIn": false,
+    "clockedOut": false,
+    "hoursWorked": 10,
+    "employeeId": "",
+    "employeeName": "",
+    "tentId": "",
+    "tent": {
+        "employeeInfo": [""],
+        "address": {
+            "streetAddress": "",
+            "code": "",
+            "province": ""
+        },
+        "openingTime": "",
+        "closingTime": "",
+        "daysOpen": "",
+        "dateCreate": ""
+    }
+}

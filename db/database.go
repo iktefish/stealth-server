@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -45,6 +46,86 @@ func (r *Database) DEBUG_GetEmployeeData(uid string, e *schema.Employee) (error,
 	}
 
 	log.Printf("Log: docRef.Exists()~~> %v\n", docRef.Exists())
+	return nil, http.StatusOK
+}
+
+func (r *Database) DEBUG_GetAllAttendanceData(attendenceData *schema.EmployeeAttendanceData) (error, int) {
+	var ctx = context.Background()
+	var attendanceDataCollection = r.client.Collection(constants.ATTENDANCE_DATA)
+	var iterable = attendanceDataCollection.Documents(ctx)
+	for {
+		docRef, err := iterable.Next()
+		if err != iterator.Done {
+			break
+		}
+		if err != nil {
+			return err, http.StatusInternalServerError
+		}
+
+		fmt.Println(docRef.Data())
+		log.Printf("Log: docRef.Exists() ~~> %v\n", docRef.Exists())
+	}
+
+	return nil, http.StatusOK
+}
+
+func (r *Database) DEBUG_GetClockedInEmployeesAttendanceData(attendenceDataList *[]schema.EmployeeAttendanceData) (error, int) {
+	ctx := context.Background()
+	attendanceDataCol := r.client.Collection(constants.ATTENDANCE_DATA)
+	dateObj := utils.TodaysDateObj()
+	docRefIter := attendanceDataCol.Where("clockedIn", "==", true).Where("date", "==", dateObj).Documents(ctx)
+	var counter int
+	for {
+		doc, err := docRefIter.Next()
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+
+			return err, http.StatusInternalServerError
+		}
+
+		var atd schema.EmployeeAttendanceData
+		err = doc.DataTo(&atd)
+		if err != nil {
+			return err, http.StatusInternalServerError
+		}
+
+		(*attendenceDataList) = append((*attendenceDataList), atd)
+		counter++
+	}
+
+	log.Printf("DEBUG_GetClockedInEmployeesAttendanceData: Retrieved~~> %v docs\n", counter)
+	return nil, http.StatusOK
+}
+
+func (r *Database) DEBUG_GetClockedOutEmployeesAttendanceData(attendenceDataList *[]schema.EmployeeAttendanceData) (error, int) {
+	ctx := context.Background()
+	attendanceDataCol := r.client.Collection(constants.ATTENDANCE_DATA)
+	dateObj := utils.TodaysDateObj()
+	docRefIter := attendanceDataCol.Where("clockedOut", "==", true).Where("date", "==", dateObj).Documents(ctx)
+	var counter int
+	for {
+		doc, err := docRefIter.Next()
+		if err != nil {
+			if err == iterator.Done {
+				break
+			}
+
+			return err, http.StatusInternalServerError
+		}
+
+		var atd schema.EmployeeAttendanceData
+		err = doc.DataTo(&atd)
+		if err != nil {
+			return err, http.StatusInternalServerError
+		}
+
+		(*attendenceDataList) = append((*attendenceDataList), atd)
+		counter++
+	}
+
+	log.Printf("DEBUG_GetClockedOutEmployeesAttendanceData: Retrieved~~> %v docs\n", counter)
 	return nil, http.StatusOK
 }
 
@@ -179,33 +260,94 @@ client SDK, thus the following function is redundant.
 
 /** @_ Clock in/out functionality **/
 
-func (r *Database) ClockIn(locId string) (error, int) {
-	var ctx = context.Background()
-	var results, err = r.client.Collection(constants.LOCATIONS).Doc(locId).Update(ctx, []firestore.Update{
-		{
-			Path:  "open",
-			Value: true,
-		},
-	})
+func (r *Database) ClockIn(tentId string, employeeId string, tent schema.Tent) (error, int) {
+	ctx := context.Background()
+	attendanceDataCol := r.client.Collection(constants.ATTENDANCE_DATA)
+	dateObj := utils.TodaysDateObj()
+
+	docRefIter := attendanceDataCol.Where("employeeId", "==", employeeId).Where("date", "==", dateObj).Where("tentId", "==", tentId).Documents(ctx)
+	_, err := docRefIter.Next()
+	if err == nil {
+		return fmt.Errorf("Document already exists"), http.StatusBadRequest
+	}
+
+	var employee schema.Employee
+	r.DEBUG_GetEmployeeData(employeeId, &employee)
+
+	attendanceData := schema.EmployeeAttendanceData{
+		Date:         dateObj,
+		ClockIn:      time.Now(),
+		ClockedIn:    true,
+		ClockedOut:   false,
+		HoursWorked:  0,
+		EmployeeID:   employeeId,
+		EmployeeName: employee.FirstName + employee.LastName,
+		TentID:       tentId,
+		Tent:         tent,
+	}
+
+	log.Printf("ClockIn: attendanceData~~> %v\n", attendanceData)
+
+	ref, result, err := attendanceDataCol.Add(ctx, attendanceData)
 	if err != nil {
 		return err, http.StatusInternalServerError
 	}
 
-	log.Printf("Log: results~~> %v\n", results)
+	log.Printf("Log: Ref~~> %v\n", ref)
+	log.Printf("Log: Result~~> %v\n", result)
 	return nil, http.StatusOK
 }
 
-func (r *Database) ClockOut(locId string) (error, int) {
-	var ctx = context.Background()
-	var results, err = r.client.Collection(constants.LOCATIONS).Doc(locId).Update(ctx, []firestore.Update{
+func (r *Database) ClockOut(tentId string, employeeId string) (error, int) {
+	ctx := context.Background()
+	attendanceDataCol := r.client.Collection(constants.ATTENDANCE_DATA)
+	// locationsCol := r.client.Collection(constants.LOCATIONS)
+	dateObj := utils.TodaysDateObj()
+
+	docRefIter := attendanceDataCol.Where("employeeId", "==", employeeId).Where("date", "==", dateObj).Where("tentId", "==", tentId).Documents(ctx)
+	doc, err := docRefIter.Next()
+	if err != nil {
+		if err == iterator.Done {
+			return fmt.Errorf("No such document exists, please check if you have entered the current Tent ID or Employee ID"), http.StatusBadRequest
+		}
+
+		return err, http.StatusInternalServerError
+	}
+
+	var attendanceData schema.EmployeeAttendanceData
+	err = doc.DataTo(&attendanceData)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	hoursWorked := time.Now().Hour() - attendanceData.ClockIn.Hour()
+	results, err := attendanceDataCol.Doc(doc.Ref.ID).Update(ctx, []firestore.Update{
 		{
-			Path:  "open",
+			Path:  "clockedIn",
 			Value: false,
+		},
+		{
+			Path:  "clockedOut",
+			Value: true,
+		},
+		{
+			Path:  "clockOut",
+			Value: time.Now(),
+		},
+		{
+			Path:  "hoursWorked",
+			Value: hoursWorked,
 		},
 	})
 	if err != nil {
 		return err, http.StatusInternalServerError
 	}
+
+	/** DONE **/
+	//  DONE Check if document (query for clocked-in == true) for current day exists
+	//  DONE Check if document (query for clocked-in == true) for provided employee ID exist
+	//  DONE Check if document (query for clocked-in == true) for provided tent ID exist
+	//  DONE (This is taken care of during clock-in procedure) Clock out only if it's clocked in
 
 	log.Printf("Log: results~~> %v\n", results)
 	return nil, http.StatusOK
@@ -332,17 +474,15 @@ func (r *Database) PutConfirmAppointment(uapId string) (error, int) {
 }
 
 func (r *Database) PutAssignEmployeeToDate(date int64) (error, int) {
-	/*
+	/** TODO **/
+	// Compute current day-month-year
+	// Query to check if a document with this day-month-year is present
+	// If not present make a document with that date
+	// Get the locationId and employeeId
+	// Check if employeeId is present in the given Location
 
-	   Compute current day-month-year
-	   Query to check if a document with this day-month-year is present
-	           If not present make a document with that date
-	   Get the locationId and employeeId
-	   Check if employeeId is present in the given Location
-
-	*/
 	var ctx = context.Background()
-	var today = utils.DateToday()
+	var today = utils.TodaysDateString()
 	var workDay = &schema.WorkDay{
 		Date:                today,
 		LocationAssignments: []schema.LocationAssignment{},

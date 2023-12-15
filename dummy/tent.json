@@ -1,0 +1,17 @@
+{
+    "employeeInfo": [
+        {
+            "employeeId": "",
+            "employeeName": "Notun Mokless"
+        }
+    ],
+    "address": {
+        "streetAddress": "",
+        "code": "",
+        "province": ""
+    },
+    "openingTime": "",
+    "closingTime": "",
+    "daysOpen": "",
+    "dateCreate": "2023-10-18T13:49:17.708Z"
+}

@@ -116,3 +116,36 @@ type ConfirmedAppointment struct {
 	Job             string `json:"job" firestore:"job"`
 	Completed       bool   `json:"completed" firestore:"completed"`
 }
+
+type EmployeeAttendanceData struct {
+	Date         time.Time `json:"date" firestore:"date"`
+	ClockIn      time.Time `json:"clockIn" firestore:"clockIn"`
+	ClockOut     time.Time `json:"clockOut" firestore:"clockOut,omitempty"`
+	ClockedIn    bool      `json:"clockedIn" firestore:"clockedIn"`
+	ClockedOut   bool      `json:"clockedOut" firestore:"clockedOut"`
+	HoursWorked  int       `json:"hoursWorked" firestore:"hoursWorked,omitempty"`
+	EmployeeID   string    `json:"employeeId" firestore:"employeeId"`
+	EmployeeName string    `json:"employeeName" firestore:"employeeName"`
+	TentID       string    `json:"tentId" firestore:"tentId"`
+	Tent         Tent      `json:"tent" firestore:"tent"`
+}
+
+type Tent struct {
+	EmployeeInfo []EmployeeInfoForTent `json:"employeeInfo" firestore:"employeeInfo"`
+	Address      Address               `json:"address" firestore:"address"`
+	OpeningTime  string                `json:"openingTime" firestore:"openingTime"`
+	ClosingTime  string                `json:"closingTime" firestore:"closingTime"`
+	DaysOpen     string                `json:"daysOpen" firestore:"daysOpen"`
+	DateCreate   time.Time             `json:"dateCreate" firestore:"dateCreate"`
+}
+
+type Address struct {
+	StreetAddress string `json:"streetAddress" firestore:"streetAddress"`
+	Code          string `json:"code" firestore:"code"`
+	Province      string `json:"province" firestore:"province"`
+}
+
+type EmployeeInfoForTent struct {
+	Id   string `json:"employeeId" firestore:"employeeId"`
+	Name string `json:"employeeName" firestore:"employeeName"`
+}
