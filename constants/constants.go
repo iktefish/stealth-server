@@ -11,12 +11,12 @@ var ServiceKeyPath = os.Getenv("PROJECT_ROOT") + "/service-key.json"
 /* Database collection names */
 const (
 	EMPLOYEES                = "Employee"
-	EX_EMPLOYEES             = "ex-employees"
+	EX_EMPLOYEES             = "Former Employee"
 	LOCATIONS                = "locations"
 	UNCONFIRMED_APPOINTMENTS = "unconfirmed-appointments"
 	CONFIRMED_APPOINTMENTS   = "confirmed-appointments"
 	WORKDAYS                 = "work-days"
-	ATTENDANCE_DATA          = "attendance-data"
+	ATTENDANCE_DATA          = "Attendance Record"
 )
 
 type WorkHours struct {

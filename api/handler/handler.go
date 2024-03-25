@@ -83,26 +83,40 @@ func (h *Handler) DEBUG_GetClockedOutEmployees(w http.ResponseWriter, r *http.Re
 
 /** @_ Auth server **/
 
+type NewlyCreatedEmployee struct {
+	Uid string `json:"uid"`
+}
+
 func (h *Handler) RegisterEmployee(w http.ResponseWriter, r *http.Request) {
+	log.Print("RegisterEmployee 1")
+	// w.Header().Set("Access-Control-Allow-Origin", "*")
+	// w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+	// w.Header().Set("Content-Type", "application/json")
+
 	var employee schema.EmployeeRegisterForm
+
 	err, statusCode := seri.JsonToEmployeeRegisterForm(r, &employee)
+	log.Printf("RegisterEmployee 2 : statusCode~~> %v err~~> \n", statusCode, err)
 	if err != nil {
 		http.Error(w, fmt.Errorf("Failed marshal").Error(), statusCode)
 		return
 	}
-
-	type NewlyCreatedEmployee struct {
-		Uid string `json:"uid"`
-	}
 	err, statusCode, id := h.db.RegisterEmployee(employee)
+	log.Printf("RegisterEmployee 3 : statusCode~~> %v err~~> \n", statusCode, err)
 	if err != nil {
 		http.Error(w, fmt.Errorf("Failed to create Employee").Error(), statusCode)
 		return
 	}
 
 	newlyCreatedEmployee := NewlyCreatedEmployee{Uid: id}
-	log.Printf("newlyCreatedEmployee.uid~~> %v\n", newlyCreatedEmployee.Uid)
+	log.Printf("RegisterEmployee 4 : newlyCreatedEmployee.uid~~> %v\n", newlyCreatedEmployee.Uid)
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
 	err = json.NewEncoder(w).Encode(newlyCreatedEmployee)
+	log.Printf("RegisterEmployee 5 : err~~> %v\n", err)
 	if err != nil {
 		http.Error(w, fmt.Errorf("Failed unmarshal").Error(), http.StatusInternalServerError)
 	}

@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/iktefish/stealth-server/api/handler"
 	clockChecker "github.com/iktefish/stealth-server/clock-checker"
 	"github.com/iktefish/stealth-server/config"
@@ -15,6 +16,12 @@ import (
 
 func main() {
 	var router = chi.NewRouter()
+	router.Use(cors.Handler(cors.Options{
+		// AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+	}))
+
 	const port string = ":8080"
 
 	/** @_ Firebase SDK and clients setup **/

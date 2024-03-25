@@ -1,0 +1,31 @@
+{
+    "firstName": "Ano",
+    "lastName": "Ther",
+    "phone": "+8801919191916",
+    "position": "Crabfeeder",
+    "gender": "male",
+    "email": "another_feeder@feeds.cats",
+    "password": "000000",
+    "birthday": "2023-10-18T13:49:17.708Z",
+    "address": "H-13#🔥#💗#👀#😱",
+    "eligibility": true,
+    "car": true,
+    "criminalOffense": true,
+    "shiftsMayAug": "May",
+    "shiftsApr": "Apr",
+    "shiftsSepOct": "Oct",
+    "hourlyWage": "100",
+    "nationality": "Homalandian",
+    "nivBlobLink": {
+        "filePath": "google.com",
+        "url": "google.com.url"
+    },
+    "cvBlobLink": {
+        "filePath": "google.com",
+        "url": "google.com.url"
+    },
+    "profilePhotoUrl": {
+        "filePath": "google.com",
+        "url": "google.com.url"
+    }
+}

@@ -159,7 +159,7 @@ func (r *Database) RegisterEmployee(employee schema.EmployeeRegisterForm) (error
 	// 	return err, statusCode
 	// }
 
-	return nil, 0, userRecord.UID
+	return nil, http.StatusOK, userRecord.UID
 }
 
 /*
@@ -224,7 +224,7 @@ func (r *Database) RemoveEmployee(uid string) (error, int) {
 	log.Printf("DEL: uid %v", uid)
 	log.Printf("MARKED: uid %v as INACTIVE", uid)
 
-	return nil, 0
+	return nil, http.StatusOK
 }
 
 /*
