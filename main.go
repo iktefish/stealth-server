@@ -20,6 +20,8 @@ func main() {
 		// AllowedOrigins:   []string{"https://*", "http://*"},
 		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders: []string{"Link"},
 	}))
 
 	const port string = ":8080"
