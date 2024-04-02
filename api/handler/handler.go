@@ -172,12 +172,25 @@ func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) ClockOut(w http.ResponseWriter, r *http.Request) {
-	var locId = r.URL.Query().Get("id")
-	if locId == "" {
-		http.Error(w, "Empty tent ID", http.StatusBadRequest)
-	}
+	// var locId = r.URL.Query().Get("id")
+	// if locId == "" {
+	// 	http.Error(w, "Empty tent ID", http.StatusBadRequest)
+	// }
 
 	// h.db.ClockOut(locId)
+
+	var employeeId = r.URL.Query().Get("employeeId")
+	var tentId = r.URL.Query().Get("tentId")
+	if tentId == "" {
+		http.Error(w, "Empty tent ID", http.StatusBadRequest)
+		return
+	}
+	if employeeId == "" {
+		http.Error(w, "Empty employee ID", http.StatusBadRequest)
+		return
+	}
+
+	h.db.ClockOut(tentId, employeeId)
 	return
 }
 
