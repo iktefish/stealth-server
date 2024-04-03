@@ -150,6 +150,10 @@ func (h *Handler) RemoveEmployee(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	var employeeId = r.URL.Query().Get("employeeId")
 	var tentId = r.URL.Query().Get("tentId")
+
+	log.Println("employeeId~~> ", employeeId)
+	log.Println("tentId~~> ", tentId)
+
 	if tentId == "" {
 		http.Error(w, "Empty tent ID", http.StatusBadRequest)
 		return
@@ -159,14 +163,16 @@ func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var tent schema.Tent
-	var err, statusCode = seri.JsonToTent(r, &tent)
-	if err != nil {
-		http.Error(w, "Faulty JSON provided", statusCode)
-		return
-	}
+	// var tent schema.Tent
+	// var err, statusCode = seri.JsonToTent(r, &tent)
+	// if err != nil {
+	// 	http.Error(w, "Faulty JSON provided", statusCode)
+	// 	return
+	// }
 
-	h.db.ClockIn(tentId, employeeId, tent)
+	log.Println("Contecting DB")
+	h.db.ClockIn(tentId, employeeId)
+	// h.db.ClockIn(tentId, employeeId, tent)
 	/* logic.CheckWorkDayOver(h.db, locId) */
 	return
 }

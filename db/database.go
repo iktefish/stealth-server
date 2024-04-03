@@ -260,19 +260,24 @@ client SDK, thus the following function is redundant.
 
 /** @_ Clock in/out functionality **/
 
-func (r *Database) ClockIn(tentId string, employeeId string, tent schema.Tent) (error, int) {
+func (r *Database) ClockIn(tentId string, employeeId string) (error, int) {
+	log.Println("In DB 1")
 	ctx := context.Background()
 	attendanceDataCol := r.client.Collection(constants.ATTENDANCE_DATA)
 	dateObj := utils.TodaysDateObj()
 
 	docRefIter := attendanceDataCol.Where("employeeId", "==", employeeId).Where("date", "==", dateObj).Where("tentId", "==", tentId).Documents(ctx)
 	_, err := docRefIter.Next()
-	if err == nil {
-		return fmt.Errorf("Document already exists"), http.StatusBadRequest
-	}
+	// if err == nil {
+	// 	log.Println("In DB ERR")
+	// 	return fmt.Errorf("Document already exists"), http.StatusBadRequest
+	// }
 
+	log.Println("In DB 2")
 	var employee schema.Employee
 	r.DEBUG_GetEmployeeData(employeeId, &employee)
+
+	log.Println("In DB 3")
 
 	attendanceData := schema.EmployeeAttendanceData{
 		Date:         dateObj,
@@ -283,7 +288,6 @@ func (r *Database) ClockIn(tentId string, employeeId string, tent schema.Tent) (
 		EmployeeID:   employeeId,
 		EmployeeName: employee.FirstName + employee.LastName,
 		TentID:       tentId,
-		Tent:         tent,
 	}
 
 	log.Printf("ClockIn: attendanceData~~> %v\n", attendanceData)
@@ -304,7 +308,7 @@ func (r *Database) ClockOut(tentId string, employeeId string) (error, int) {
 	// locationsCol := r.client.Collection(constants.LOCATIONS)
 	dateObj := utils.TodaysDateObj()
 
-	docRefIter := attendanceDataCol.Where("employeeId", "==", employeeId).Where("date", "==", dateObj).Where("tentId", "==", tentId).Documents(ctx)
+	docRefIter := attendanceDataCol.Where("employeeId", "==", employeeId).Where("date", "==", dateObj).Where("tentId", "==", tentId).Where("clockedIn", "==", true).Documents(ctx)
 	doc, err := docRefIter.Next()
 	if err != nil {
 		if err == iterator.Done {
