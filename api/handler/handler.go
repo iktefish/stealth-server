@@ -150,9 +150,11 @@ func (h *Handler) RemoveEmployee(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	var employeeId = r.URL.Query().Get("employeeId")
 	var tentId = r.URL.Query().Get("tentId")
+	var hourlyWage = r.URL.Query().Get("hourlyWage")
 
 	log.Println("employeeId~~> ", employeeId)
 	log.Println("tentId~~> ", tentId)
+	log.Println("hourlyWage~~> ", hourlyWage)
 
 	if tentId == "" {
 		http.Error(w, "Empty tent ID", http.StatusBadRequest)
@@ -160,6 +162,10 @@ func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	}
 	if employeeId == "" {
 		http.Error(w, "Empty employee ID", http.StatusBadRequest)
+		return
+	}
+	if hourlyWage == "" {
+		http.Error(w, "Empty hourly wage", http.StatusBadRequest)
 		return
 	}
 
@@ -171,7 +177,7 @@ func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	// }
 
 	log.Println("Contecting DB")
-	h.db.ClockIn(tentId, employeeId)
+	h.db.ClockIn(tentId, employeeId, hourlyWage)
 	// h.db.ClockIn(tentId, employeeId, tent)
 	/* logic.CheckWorkDayOver(h.db, locId) */
 	return

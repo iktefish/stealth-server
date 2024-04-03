@@ -260,7 +260,7 @@ client SDK, thus the following function is redundant.
 
 /** @_ Clock in/out functionality **/
 
-func (r *Database) ClockIn(tentId string, employeeId string) (error, int) {
+func (r *Database) ClockIn(tentId string, employeeId string, hourlyWage string) (error, int) {
 	log.Println("In DB 1")
 	ctx := context.Background()
 	attendanceDataCol := r.client.Collection(constants.ATTENDANCE_DATA)
@@ -287,6 +287,7 @@ func (r *Database) ClockIn(tentId string, employeeId string) (error, int) {
 		HoursWorked:  0,
 		EmployeeID:   employeeId,
 		EmployeeName: employee.FirstName + employee.LastName,
+		HourlyWage:   hourlyWage,
 		TentID:       tentId,
 	}
 

@@ -127,6 +127,7 @@ type EmployeeAttendanceData struct {
 	EmployeeID   string    `json:"employeeId" firestore:"employeeId"`
 	EmployeeName string    `json:"employeeName" firestore:"employeeName"`
 	TentID       string    `json:"tentId" firestore:"tentId"`
+	HourlyWage   string    `json:"hourlyWage" firestore:"hourlyWage"`
 	Tent         Tent      `json:"tent" firestore:"tent"`
 }
 
