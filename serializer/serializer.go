@@ -154,3 +154,12 @@ func (s *Serializer) ConfirmedAppointmentToJson(w io.Writer, a schema.ConfirmedA
 
 	return nil, http.StatusOK
 }
+
+func (s *Serializer) JsonToNewEmployeeInfo(r *http.Request, l *schema.EmployeeInfoForAuthCredChange) (error, int) {
+	var err = json.NewDecoder(r.Body).Decode(l)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}

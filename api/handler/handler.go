@@ -208,6 +208,34 @@ func (h *Handler) ClockOut(w http.ResponseWriter, r *http.Request) {
 
 /** // **/
 
+/** @_ Update employee info (for Auth) **/
+
+func (h *Handler) UpdateEmployeeInfo(w http.ResponseWriter, r *http.Request) {
+	log.Printf("UpdateEmployeeInfo 1")
+
+	var info schema.EmployeeInfoForAuthCredChange
+	err, statusCode := seri.JsonToNewEmployeeInfo(r, &info)
+	log.Printf("UpdateEmployeeInfo 2 : statusCode~~> %v err~~> \n", statusCode, err)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Failed marshal").Error(), statusCode)
+		return
+	}
+
+	err, statusCode = h.db.UpdateEmployeeInfo(info)
+	log.Printf("UpdateEmployeeInfo 3 : statusCode~~> %v err~~> \n", statusCode, err)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Failed to update info").Error(), statusCode)
+		return
+	}
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+}
+
+/** // **/
+
 func (h *Handler) PostAppointment(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Unimplemented")
 	return

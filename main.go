@@ -87,6 +87,12 @@ func main() {
 
 	/** // **/
 
+	/** @_ Change employee credentials (for Auth) **/
+
+	router.Put("/update-employee-info", handler.UpdateEmployeeInfo)
+
+	/** // **/
+
 	/** @_ Priodically check time **/
 
 	go clockChecker.CheckerLoop(&db)

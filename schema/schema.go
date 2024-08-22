@@ -150,3 +150,11 @@ type EmployeeInfoForTent struct {
 	Id   string `json:"employeeId" firestore:"employeeId"`
 	Name string `json:"employeeName" firestore:"employeeName"`
 }
+
+type EmployeeInfoForAuthCredChange struct {
+	Id                string `json:"id"`
+	Email             string `json:"email"`
+	Password          string `json:"password"`
+	DisplayName       string `json:"displayName"`
+	ProfilePictureUrl string `json:"profilePictureUrl"`
+}

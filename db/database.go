@@ -360,6 +360,28 @@ func (r *Database) ClockOut(tentId string, employeeId string) (error, int) {
 
 /** // **/
 
+/** @_ Update employee info (for Auth) **/
+
+func (r *Database) UpdateEmployeeInfo(info schema.EmployeeInfoForAuthCredChange) (error, int) {
+	var infoToUpdate = (&auth.UserToUpdate{}).
+		Email(info.Email).
+		Password(info.Password).
+		DisplayName(info.DisplayName).
+		PhotoURL(info.ProfilePictureUrl)
+
+	var ctx = context.Background()
+	var updatedRecord, err = r.auth.UpdateUser(ctx, info.Id, infoToUpdate)
+	if err != nil {
+		log.Printf("err~~> %v\n", err)
+		return err, http.StatusInternalServerError
+	}
+
+	log.Printf("UpdateEmployeeInfo: updatedRecord~~> %v\n", updatedRecord.UID)
+	return nil, http.StatusOK
+}
+
+/** // **/
+
 func (r *Database) PostAppointment(uap schema.UnconfirmedAppointment, cell int) (error, int) {
 	var ctx = context.Background()
 	var docRef, results, err = r.client.Collection(constants.UNCONFIRMED_APPOINTMENTS).Add(ctx, uap)
