@@ -17,6 +17,7 @@ const (
 	CONFIRMED_APPOINTMENTS   = "confirmed-appointments"
 	WORKDAYS                 = "work-days"
 	ATTENDANCE_DATA          = "Attendance Record"
+	TENT_STATE_RECORDS       = "tent-state-records"
 )
 
 type WorkHours struct {

@@ -176,10 +176,14 @@ func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	// 	return
 	// }
 
-	log.Println("Contecting DB")
+	log.Println("Contecting DB for ClockIn")
 	h.db.ClockIn(tentId, employeeId, hourlyWage)
 	// h.db.ClockIn(tentId, employeeId, tent)
 	/* logic.CheckWorkDayOver(h.db, locId) */
+
+	log.Println("Contecting DB for SetTentStateOpen")
+	h.db.SetTentStateOpen(tentId, employeeId)
+
 	return
 }
 
@@ -202,7 +206,12 @@ func (h *Handler) ClockOut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Println("Contecting DB for ClockOut")
 	h.db.ClockOut(tentId, employeeId)
+
+	log.Println("Contecting DB for SetTentStateClose")
+	h.db.SetTentStateClose(tentId, employeeId)
+
 	return
 }
 

@@ -382,6 +382,112 @@ func (r *Database) UpdateEmployeeInfo(info schema.EmployeeInfoForAuthCredChange)
 
 /** // **/
 
+/** @_ Toggling tent states **/
+
+func (r *Database) SetTentStateOpen(tentId string, employeeId string) (error, int) {
+	var tent schema.TentStateRecord
+	r.GetTentData(tentId, &tent)
+
+	/// Append employeeId to tent data.
+	var employeeData schema.TentStateEmployeeRecord
+	employeeData.Id = employeeId
+	tent.ClockedEmployees = append(tent.ClockedEmployees, employeeData)
+
+	// for _, v := range tent.ClockedEmployees {
+	// 	if v.Id == employeeId {
+	// 		tent.ClockedEmployees = append(tent.ClockedEmployees[:i], tent.ClockedEmployees[i+1:]...)
+	// 	}
+	// }
+
+	var ctx = context.Background()
+
+	/// Toggle "open" state to true.
+	var tentCollection = r.client.Collection(constants.TENT_STATE_RECORDS)
+	var _, err = tentCollection.Doc(tentId).Update(ctx, []firestore.Update{
+		{
+			Path:  "clockedEmployees",
+			Value: tent.ClockedEmployees,
+		},
+		{
+			Path:  "open",
+			Value: true,
+		},
+	})
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	return nil, http.StatusOK
+}
+
+func (r *Database) SetTentStateClose(tentId string, employeeId string) (error, int) {
+	var tent schema.TentStateRecord
+	r.GetTentData(tentId, &tent)
+
+	/// Remove employeeId from tent data.
+	for i, v := range tent.ClockedEmployees {
+		if v.Id == employeeId {
+			tent.ClockedEmployees = append(tent.ClockedEmployees[:i], tent.ClockedEmployees[i+1:]...)
+		}
+	}
+
+	var ctx = context.Background()
+
+	if len(tent.ClockedEmployees) != 0 {
+		/// Some employees are still clocked in, just update "clockedEmployees".
+		var tentCollection = r.client.Collection(constants.TENT_STATE_RECORDS)
+		var _, err = tentCollection.Doc(tentId).Update(ctx, []firestore.Update{
+			{
+				Path:  "clockedEmployees",
+				Value: tent.ClockedEmployees,
+			},
+		})
+		if err != nil {
+			return err, http.StatusInternalServerError
+		}
+
+		return nil, http.StatusOK
+	} else {
+		/// No clocked in employees, so set "open" state to false.
+		var tentCollection = r.client.Collection(constants.TENT_STATE_RECORDS)
+		var _, err = tentCollection.Doc(tentId).Update(ctx, []firestore.Update{
+			{
+				Path:  "clockedEmployees",
+				Value: tent.ClockedEmployees,
+			},
+			{
+				Path:  "open",
+				Value: false,
+			},
+		})
+		if err != nil {
+			return err, http.StatusInternalServerError
+		}
+
+		return nil, http.StatusOK
+	}
+}
+
+func (r *Database) GetTentData(uid string, t *schema.TentStateRecord) (error, int) {
+	var ctx = context.Background()
+
+	var tentCollection = r.client.Collection(constants.TENT_STATE_RECORDS)
+	var docRef, err = tentCollection.Doc(uid).Get(ctx)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	err = docRef.DataTo(*t)
+	if err != nil {
+		return err, http.StatusInternalServerError
+	}
+
+	log.Printf("API Log for GetTentData: docRef.Exists()~~> %v\n", docRef.Exists())
+	return nil, http.StatusOK
+}
+
+/** // **/
+
 func (r *Database) PostAppointment(uap schema.UnconfirmedAppointment, cell int) (error, int) {
 	var ctx = context.Background()
 	var docRef, results, err = r.client.Collection(constants.UNCONFIRMED_APPOINTMENTS).Add(ctx, uap)

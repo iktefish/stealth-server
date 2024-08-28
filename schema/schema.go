@@ -158,3 +158,15 @@ type EmployeeInfoForAuthCredChange struct {
 	DisplayName       string `json:"displayName"`
 	ProfilePictureUrl string `json:"profilePictureUrl"`
 }
+
+type TentStateEmployeeRecord struct {
+	Id string `json:"id" firestore:"id"`
+	// EmployeeName string `json:"name" firestore:"name"`
+}
+
+type TentStateRecord struct {
+	TentId           string                    `json:"tentId" firestore:"tentId"`
+	TentName         string                    `json:"tentName" firestore:"tentName"`
+	ClockedEmployees []TentStateEmployeeRecord `json:"clockedEmployees" firestore:"clockedEmployeed"`
+	Open             bool                      `json:"open" firestore:"open"`
+}

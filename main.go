@@ -93,6 +93,12 @@ func main() {
 
 	/** // **/
 
+	/** @_ Tent state **/
+
+	// router.Put("/", handler.UpdateEmployeeInfo)
+
+	/** // **/
+
 	/** @_ Priodically check time **/
 
 	go clockChecker.CheckerLoop(&db)
