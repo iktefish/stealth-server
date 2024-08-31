@@ -156,6 +156,7 @@ type EmployeeInfoForAuthCredChange struct {
 	Email             string `json:"email"`
 	Password          string `json:"password"`
 	DisplayName       string `json:"displayName"`
+	Contact           string `json:"contact"`
 	ProfilePictureUrl string `json:"profilePictureUrl"`
 }
 

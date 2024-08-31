@@ -367,6 +367,7 @@ func (r *Database) UpdateEmployeeInfo(info schema.EmployeeInfoForAuthCredChange)
 		Email(info.Email).
 		Password(info.Password).
 		DisplayName(info.DisplayName).
+		PhoneNumber(info.Contact).
 		PhotoURL(info.ProfilePictureUrl)
 
 	var ctx = context.Background()
