@@ -31,6 +31,7 @@ func CheckerLoop(r *db.Database) {
 			/** DONE: Mark them "Clocked Out" **/
 			for _, attendanceData := range attendanceDataList {
 				r.ClockOut(attendanceData.TentID, attendanceData.EmployeeID)
+				r.SetTentStateClose(attendanceData.TentID, attendanceData.EmployeeID)
 			}
 		}
 
