@@ -74,7 +74,7 @@ func main() {
 	/** @_ Debugging utilities **/
 
 	router.Post("/get-employee", handler.DEBUG_GetEmployeeData)
-	// router.Post("/get-all-attendance-data", handler.DEBUG_GetAllAttendanceData)
+	router.Post("/get-all-attendance-data", handler.DEBUG_GetAllAttendanceData)
 	router.Post("/get-clocked-in-employees", handler.DEBUG_GetClockedInEmployees)
 	router.Post("/get-clocked-out-employees", handler.DEBUG_GetClockedOutEmployees)
 

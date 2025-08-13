@@ -2,11 +2,14 @@ package config
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	firestore "cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
-	"github.com/iktefish/stealth-server/constants"
+
+	// "github.com/iktefish/stealth-server/constants"
 	"google.golang.org/api/option"
 )
 
@@ -34,7 +37,16 @@ func NewSdkAndClients() (*firebase.App, *auth.Client, *firestore.Client, error) 
 /* Initiates a new Firebase SDK from 'service-key.json' file. You can generate this file from "Firebase Console" > "Project Overview" > "Service accounts" > "Generate new private key" (select Go). */
 func InitFirebaseSdk() (*firebase.App, error) {
 	var ctx = context.Background()
-	var opt = option.WithCredentialsFile(constants.ServiceKeyPath)
+
+	var key = os.Getenv("KEY")
+
+	fmt.Println("---")
+	fmt.Println(key)
+	fmt.Println("---")
+
+	var opt = option.WithCredentialsJSON([]byte(key))
+	// var opt = option.WithCredentialsFile(constants.ServiceKeyPath)
+
 	var app, err = firebase.NewApp(ctx, nil, opt)
 	if err != nil {
 		return nil, err

@@ -37,11 +37,15 @@ func (r *Database) DEBUG_GetEmployeeData(uid string, e *schema.Employee) (error,
 	var employeeCollection = r.client.Collection(constants.EMPLOYEES)
 	var docRef, err = employeeCollection.Doc(uid).Get(ctx)
 	if err != nil {
+		log.Print("DEBUG_GetEmployeeData, err != nil [1]")
 		return err, http.StatusInternalServerError
 	}
 
+	log.Printf("DEBUG_GetEmployeeData, fetched document: %v \n", docRef.Data())
+
 	err = docRef.DataTo(e)
 	if err != nil {
+		log.Print("DEBUG_GetEmployeeData, err != nil [2]")
 		return err, http.StatusInternalServerError
 	}
 
@@ -277,16 +281,18 @@ func (r *Database) ClockIn(tentId string, employeeId string, hourlyWage string) 
 	var employee schema.Employee
 	r.DEBUG_GetEmployeeData(employeeId, &employee)
 
-	log.Println("In DB 3")
+	fullName := employee.FirstName + " " + employee.LastName
+
+	log.Printf("In DB 3, employee name: %v, at time: %v\n", fullName, time.Now())
 
 	attendanceData := schema.EmployeeAttendanceData{
 		Date:         dateObj,
-		ClockIn:      time.Now(),
+		ClockIn:      time.Now().UTC(),
 		ClockedIn:    true,
 		ClockedOut:   false,
 		HoursWorked:  0,
 		EmployeeID:   employeeId,
-		EmployeeName: employee.FirstName + employee.LastName,
+		EmployeeName: fullName,
 		HourlyWage:   hourlyWage,
 		TentID:       tentId,
 	}
@@ -325,7 +331,16 @@ func (r *Database) ClockOut(tentId string, employeeId string) (error, int) {
 		return err, http.StatusInternalServerError
 	}
 
-	hoursWorked := time.Now().Hour() - attendanceData.ClockIn.Hour()
+	var minutesWorked float64 = float64(time.Now().UTC().Minute() - attendanceData.ClockIn.Minute())
+	var hoursWorked float64 = float64(time.Now().UTC().Hour()-attendanceData.ClockIn.Hour()) + float64(minutesWorked/60)
+
+	log.Printf("minutesWorked: %v\n", minutesWorked)
+	log.Printf("hoursWorked: %v\n", hoursWorked)
+	log.Printf("time.Now().UTC().Hour(): %v\n", time.Now().UTC().Hour())
+	log.Printf("attendanceData: %v\n", attendanceData)
+	log.Printf("attendanceData.ClockIn.Hour(): %v\n", attendanceData.ClockIn.Hour())
+	log.Printf("Employee of ID %v, hoursWorked: %v\n", employeeId, hoursWorked)
+
 	results, err := attendanceDataCol.Doc(doc.Ref.ID).Update(ctx, []firestore.Update{
 		{
 			Path:  "clockedIn",
@@ -337,7 +352,7 @@ func (r *Database) ClockOut(tentId string, employeeId string) (error, int) {
 		},
 		{
 			Path:  "clockOut",
-			Value: time.Now(),
+			Value: time.Now().UTC(),
 		},
 		{
 			Path:  "hoursWorked",

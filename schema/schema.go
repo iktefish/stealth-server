@@ -56,15 +56,40 @@ type EmployeeRegisterForm struct {
 	Date            time.Time   `json:"date" firestore:"date"`
 }
 
+// type Employee struct {
+// 	FirstName       string      `json:"firstName" firestore:"firstName"`
+// 	LastName        string      `json:"lastName" firestore:"lastName"`
+// 	Phone           string      `json:"phone" firestore:"phone"`
+// 	Position        string      `json:"position" firestore:"position"`
+// 	Gender          string      `json:"gender" firestore:"gender"`
+// 	Email           string      `json:"email" firestore:"email"`
+// 	Birthday        string      `json:"bday" firestore:"bday"`
+// 	Address         string      `json:"address" firestore:"address"`
+// 	Eligibility     bool        `json:"eligibility" firestore:"eligibility"`
+// 	Car             bool        `json:"car" firestore:"car"`
+// 	CriminalOffense bool        `json:"criminalOffense" firestore:"criminalOffense"`
+// 	ShiftsMayAug    string      `json:"shiftsMayAug" firestore:"shiftsMayAug"`
+// 	ShiftsApr       string      `json:"shiftsApr" firestore:"shiftsApr"`
+// 	ShiftsSepOct    string      `json:"shiftsSepOct" firestore:"shiftsSepOct"`
+// 	HourlyWage      string      `json:"hourlyWage" firestore:"hourlyWage"`
+// 	Nationality     string      `json:"nationality" firestore:"nationality"`
+// 	NidBlobLink     LinkAndPath `json:"nidBlobLink" firestore:"nidBlobLink"`
+// 	CvBlobLink      LinkAndPath `json:"cvBlobLink" firestore:"cvBlobLink"`
+// 	ProfilePhotoUrl LinkAndPath `json:"profilePhotoUrl" firestore:"profilePhotoUrl"`
+// 	Date            time.Time   `json:"date" firestore:"date"`
+// }
+
 type Employee struct {
 	FirstName       string      `json:"firstName" firestore:"firstName"`
 	LastName        string      `json:"lastName" firestore:"lastName"`
 	Phone           string      `json:"phone" firestore:"phone"`
+	SIN             string      `json:"SIN" firestore:"SIN"`
 	Position        string      `json:"position" firestore:"position"`
 	Gender          string      `json:"gender" firestore:"gender"`
 	Email           string      `json:"email" firestore:"email"`
 	Birthday        string      `json:"bday" firestore:"bday"`
-	Address         string      `json:"address" firestore:"address"`
+	Address         Address     `json:"address" firestore:"address"`
+	BankInfo        BankInfo    `json:"bankInfo" firestore:"bankInfo"`
 	Eligibility     bool        `json:"eligibility" firestore:"eligibility"`
 	Car             bool        `json:"car" firestore:"car"`
 	CriminalOffense bool        `json:"criminalOffense" firestore:"criminalOffense"`
@@ -118,17 +143,18 @@ type ConfirmedAppointment struct {
 }
 
 type EmployeeAttendanceData struct {
-	Date         time.Time `json:"date" firestore:"date"`
-	ClockIn      time.Time `json:"clockIn" firestore:"clockIn"`
-	ClockOut     time.Time `json:"clockOut" firestore:"clockOut,omitempty"`
-	ClockedIn    bool      `json:"clockedIn" firestore:"clockedIn"`
-	ClockedOut   bool      `json:"clockedOut" firestore:"clockedOut"`
-	HoursWorked  int       `json:"hoursWorked" firestore:"hoursWorked,omitempty"`
-	EmployeeID   string    `json:"employeeId" firestore:"employeeId"`
-	EmployeeName string    `json:"employeeName" firestore:"employeeName"`
-	TentID       string    `json:"tentId" firestore:"tentId"`
-	HourlyWage   string    `json:"hourlyWage" firestore:"hourlyWage"`
-	Tent         Tent      `json:"tent" firestore:"tent"`
+	Date       time.Time `json:"date" firestore:"date"`
+	ClockIn    time.Time `json:"clockIn" firestore:"clockIn"`
+	ClockOut   time.Time `json:"clockOut" firestore:"clockOut,omitempty"`
+	ClockedIn  bool      `json:"clockedIn" firestore:"clockedIn"`
+	ClockedOut bool      `json:"clockedOut" firestore:"clockedOut"`
+	// HoursWorked  int     `json:"hoursWorked" firestore:"hoursWorked,omitempty"`
+	HoursWorked  float64 `json:"hoursWorked" firestore:"hoursWorked,omitempty"`
+	EmployeeID   string  `json:"employeeId" firestore:"employeeId"`
+	EmployeeName string  `json:"employeeName" firestore:"employeeName"`
+	TentID       string  `json:"tentId" firestore:"tentId"`
+	HourlyWage   string  `json:"hourlyWage" firestore:"hourlyWage"`
+	Tent         Tent    `json:"tent" firestore:"tent"`
 }
 
 type Tent struct {
@@ -144,6 +170,13 @@ type Address struct {
 	StreetAddress string `json:"streetAddress" firestore:"streetAddress"`
 	Code          string `json:"code" firestore:"code"`
 	Province      string `json:"province" firestore:"province"`
+}
+
+type BankInfo struct {
+	CheckNum       string `json:"checkNum" firestore:"checkNum"`
+	TransitNum     string `json:"transitNum" firestore:"transitNum"`
+	InstitutionNum string `json:"institutionNum" firestore:"institutionNum"`
+	BankAccNum     string `json:"bankAccNum" firestore:"bankAccNum"`
 }
 
 type EmployeeInfoForTent struct {

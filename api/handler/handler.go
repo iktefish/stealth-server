@@ -46,20 +46,20 @@ func (h *Handler) DEBUG_GetEmployeeData(w http.ResponseWriter, r *http.Request) 
 	}
 }
 
-// func (h *Handler) DEBUG_GetAllAttendanceData(w http.ResponseWriter, r *http.Request) {
-// 	var attendenceDate schema.EmployeeAttendanceData
-// 	err, statusCode := h.db.DEBUG_GetClockedInEmployees(&attendenceDate)
-// 	if err != nil {
-// 		http.Error(w, fmt.Errorf("Internal server error").Error(), statusCode)
-// 		return
-// 	}
-//
-// 	err, statusCode = seri.EmployeeAttendanceDataToJson(w, attendenceDate)
-// 	if err != nil {
-// 		http.Error(w, fmt.Errorf("Failed unmarshal").Error(), statusCode)
-// 		return
-// 	}
-// }
+func (h *Handler) DEBUG_GetAllAttendanceData(w http.ResponseWriter, r *http.Request) {
+	var attendenceDate schema.EmployeeAttendanceData
+	err, statusCode := h.db.DEBUG_GetAllAttendanceData(&attendenceDate)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Internal server error").Error(), statusCode)
+		return
+	}
+
+	err, statusCode = seri.EmployeeAttendanceDataToJson(w, attendenceDate)
+	if err != nil {
+		http.Error(w, fmt.Errorf("Failed unmarshal").Error(), statusCode)
+		return
+	}
+}
 
 func (h *Handler) DEBUG_GetClockedInEmployees(w http.ResponseWriter, r *http.Request) {
 	var attendanceData []schema.EmployeeAttendanceData
@@ -181,8 +181,11 @@ func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	// h.db.ClockIn(tentId, employeeId, tent)
 	/* logic.CheckWorkDayOver(h.db, locId) */
 
-	log.Println("Contecting DB for SetTentStateOpen")
+	log.Println("Contacting DB: SetTentStateOpen")
 	h.db.SetTentStateOpen(tentId, employeeId)
+	log.Println("DONE: SetTentStateOpen")
+
+	log.Println("------------------------------------------")
 
 	return
 }
@@ -206,11 +209,20 @@ func (h *Handler) ClockOut(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("Contecting DB for ClockOut")
-	h.db.ClockOut(tentId, employeeId)
+	log.Println("Contacting DB: ClockOut")
+	err, statusCode := h.db.ClockOut(tentId, employeeId)
+	if err != nil {
+		log.Printf("Error contacting DB: %v\n", err.Error())
+		http.Error(w, fmt.Errorf("Internal server error").Error(), statusCode)
+	} else {
+		log.Println("DONE: ClockOut")
+	}
 
-	log.Println("Contecting DB for SetTentStateClose")
+	log.Println("Contacting DB: SetTentStateClose")
 	h.db.SetTentStateClose(tentId, employeeId)
+	log.Println("DONE: SetTentStateClose")
+
+	log.Println("------------------------------------------")
 
 	return
 }
