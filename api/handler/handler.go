@@ -185,6 +185,11 @@ func (h *Handler) ClockIn(w http.ResponseWriter, r *http.Request) {
 	h.db.SetTentStateOpen(tentId, employeeId)
 	log.Println("DONE: SetTentStateOpen")
 
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
 	log.Println("------------------------------------------")
 
 	return
@@ -221,6 +226,11 @@ func (h *Handler) ClockOut(w http.ResponseWriter, r *http.Request) {
 	log.Println("Contacting DB: SetTentStateClose")
 	h.db.SetTentStateClose(tentId, employeeId)
 	log.Println("DONE: SetTentStateClose")
+
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS")
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 
 	log.Println("------------------------------------------")
 
