@@ -20,6 +20,13 @@ const (
 	TENT_STATE_RECORDS       = "tent-state-records"
 )
 
+var ORIGINS = []string{
+	"https://stealthwindshieldrepairs.com",
+	"https://www.stealthwindshieldrepairs.com",
+	"http://stealthwindshieldrepairs.com",
+	"http://www.stealthwindshieldrepairs.com",
+}
+
 type WorkHours struct {
 	Start struct {
 		Hour   int
